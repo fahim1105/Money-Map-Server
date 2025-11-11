@@ -85,7 +85,7 @@ async function run() {
         })
 
         // Transaction related API
-        app.get('/transactions', logger, VerifyFirebaseToken, async (req, res) => {
+        app.get('/transactions', VerifyFirebaseToken, async (req, res) => {
             // console.log(req.headers)
             const email = req.query.email;
             const query = {};
@@ -100,7 +100,12 @@ async function run() {
             res.send(result)
         })
 
-      
+        app.get('/transactions/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: new ObjectId(id) }
+            const result = await TransactionCollection.findOne(query);
+            res.send(result)
+        })
 
 
         app.post('/transactions', VerifyFirebaseToken, async (req, res) => {
