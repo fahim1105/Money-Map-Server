@@ -18,7 +18,10 @@ admin.initializeApp({
 app.use(cors());
 app.use(express.json())
 
+// const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.mcccn4v.mongodb.net/Money_Map?retryWrites=true&w=majority&appName=Cluster0`;
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.mcccn4v.mongodb.net/?appName=Cluster0`;
+
+// 103.96.69.121/32
 
 const client = new MongoClient(uri, {
     serverApi: {
@@ -97,17 +100,13 @@ async function run() {
             res.send(result)
         })
 
-        app.get('/transactions/:id', async (req, res) => {
-            const id = req.params.id;
-            const query = { _id: new ObjectId(id) }
-            const result = await TransactionCollection.findOne(query);
-            res.send(result)
-        })
+      
 
 
         app.post('/transactions', VerifyFirebaseToken, async (req, res) => {
             // console.log("Hey",req.headers)
             const newTransaction = req.body;
+            console.log(newTransaction)
             const result = await TransactionCollection.insertOne(newTransaction)
             console.log(result)
             res.send(result);
