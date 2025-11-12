@@ -151,8 +151,6 @@ async function run() {
                 console.error("Update error:", error);
                 res.status(500).send({ message: "Failed to update transaction", error: error.message });
             }
-
-            // hbjnkm
         });
 
 
