@@ -111,7 +111,6 @@ async function run() {
         app.post('/transactions', VerifyFirebaseToken, async (req, res) => {
             // console.log("Hey",req.headers)
             const newTransaction = req.body;
-            console.log(newTransaction)
             const result = await TransactionCollection.insertOne(newTransaction)
             console.log(result)
             res.send(result);
