@@ -123,30 +123,36 @@ async function run() {
             res.send(result)
         })
 
-        app.patch('/transactions/:id', async (req, res) => {
+        // Update a transaction by ID
+        app.put('/transactions/update/:id', async (req, res) => {
             const id = req.params.id;
-            const updatedTransaction = req.body;
+            const updatedData = req.body;
 
-            const query = { _id: new ObjectId(id) }; // convert id to ObjectId
-            const update = {
-                $set: {
-                    type: updatedTransaction.type,
-                    description: updatedTransaction.description,
-                    category: updatedTransaction.category,
-                    amount: updatedTransaction.amount,
-                    date: updatedTransaction.date
+            try {
+                const query = { _id: new ObjectId(id) };
+                const updateDoc = {
+                    $set: {
+                        type: updatedData.type,
+                        category: updatedData.category,
+                        amount: updatedData.amount,
+                        description: updatedData.description,
+                        date: updatedData.date,
+                    },
+                };
+
+                const result = await TransactionCollection.updateOne(query, updateDoc);
+
+                if (result.modifiedCount === 0) {
+                    return res.status(404).send({ message: "No transaction found or no changes made" });
                 }
 
-            };
-
-            const options = {};
-            try {
-                const result = await TransactionCollection.updateOne(query, update, options);
-                res.send(result);
+                res.send({ message: "Transaction updated successfully", result });
             } catch (error) {
-                res.status(500).send({ error: 'Failed to update transaction', details: error.message });
+                console.error("Update error:", error);
+                res.status(500).send({ message: "Failed to update transaction", error: error.message });
             }
         });
+
 
         // await client.db("admin").command({ ping: 1 });
         // console.log("Pinged your deployment. You successfully connected to MongoDB!");
