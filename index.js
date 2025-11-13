@@ -94,7 +94,7 @@ async function run() {
                 }
                 query.email = email;
             }
-            const cursor = TransactionCollection.find(query);
+            const cursor = TransactionCollection.find(query).sort({ date: -1 });
             const result = await cursor.toArray();
             res.send(result)
         })
