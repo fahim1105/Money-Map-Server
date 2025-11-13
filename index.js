@@ -151,6 +151,42 @@ async function run() {
                 res.status(500).send({ message: "Failed to update transaction", error: error.message });
             }
         });
+
+        //  OVERVIEW API (Total Income, Expense & Balance)
+        // Help from CHAT GPT 
+
+        app.get('/overview', VerifyFirebaseToken, async (req, res) => {
+            const email = req.query.email;
+            if (!email) {
+                return res.status(400).send({ message: "Email is required" });
+            }
+
+            if (email !== req.token_email) {
+                return res.status(403).send({ message: "Forbidden Access" });
+            }
+
+            const query = { email };
+
+            const allTransactions = await TransactionCollection.find(query).toArray();
+
+            let totalIncome = 0;
+            let totalExpense = 0;
+
+            allTransactions.forEach(t => {
+                const amount = Number(t.amount) || 0;
+                if (t.type === "Income") totalIncome += amount;
+                else if (t.type === "Expense") totalExpense += amount;
+            });
+
+            const balance = totalIncome - totalExpense;
+
+            res.send({
+                email,
+                totalIncome,
+                totalExpense,
+                balance
+            });
+        });
         // await client.db("admin").command({ ping: 1 });
         // console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
