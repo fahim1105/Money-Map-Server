@@ -1,3 +1,4 @@
 .env
 node_modules
 money-map-firebase-adminsdk.json
+.vercel

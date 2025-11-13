@@ -20,7 +20,6 @@ app.use(express.json())
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.mcccn4v.mongodb.net/?appName=Cluster0`;
 
-// 103.96.69.121/32
 
 const client = new MongoClient(uri, {
     serverApi: {
@@ -30,10 +29,6 @@ const client = new MongoClient(uri, {
     }
 });
 
-const logger = (req, res, next) => {
-    console.log("Login information")
-    next()
-}
 const VerifyFirebaseToken = async (req, res, next) => {
     // console.log("in the verify middleware", req.headers.authorization)
     if (!req.headers.authorization) {
@@ -62,7 +57,7 @@ app.get('/', (req, res) => {
 
 async function run() {
     try {
-        await client.connect();
+        // await client.connect();
         const database = client.db("Money_Map")
         const TransactionCollection = database.collection("transactions")
         const UsersCollection = database.collection("Users")
@@ -99,7 +94,7 @@ async function run() {
             res.send(result)
         })
 
-        app.get('/transactions/:id', VerifyFirebaseToken, async (req, res) => {
+        app.get('/transactions/:id',  async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) }
             const result = await TransactionCollection.findOne(query);
