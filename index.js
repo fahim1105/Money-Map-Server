@@ -99,7 +99,7 @@ async function run() {
             res.send(result)
         })
 
-        app.get('/transactions/:id', async (req, res) => {
+        app.get('/transactions/:id', VerifyFirebaseToken, async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) }
             const result = await TransactionCollection.findOne(query);
@@ -115,7 +115,7 @@ async function run() {
             res.send(result);
         })
 
-        app.delete('/transactions/:id', async (req, res) => {
+        app.delete('/transactions/:id', VerifyFirebaseToken, async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) }
             const result = await TransactionCollection.deleteOne(query);
@@ -123,7 +123,7 @@ async function run() {
         })
 
         // Update a transaction by ID
-        app.put('/transactions/update/:id', async (req, res) => {
+        app.put('/transactions/update/:id', VerifyFirebaseToken, async (req, res) => {
             const id = req.params.id;
             const updatedData = req.body;
 
