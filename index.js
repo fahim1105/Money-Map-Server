@@ -18,7 +18,6 @@ admin.initializeApp({
 app.use(cors());
 app.use(express.json())
 
-// const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.mcccn4v.mongodb.net/Money_Map?retryWrites=true&w=majority&appName=Cluster0`;
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.mcccn4v.mongodb.net/?appName=Cluster0`;
 
 // 103.96.69.121/32
@@ -152,8 +151,6 @@ async function run() {
                 res.status(500).send({ message: "Failed to update transaction", error: error.message });
             }
         });
-
-
         // await client.db("admin").command({ ping: 1 });
         // console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
