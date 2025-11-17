@@ -61,6 +61,8 @@ async function run() {
         const database = client.db("Money_Map")
         const TransactionCollection = database.collection("transactions")
         const UsersCollection = database.collection("Users")
+        const UserStatsCollection = database.collection("userStats");
+
 
         // User Related API
         app.post('/users', async (req, res) => {
@@ -79,28 +81,55 @@ async function run() {
         })
 
         // Transaction related API
-        app.get('/transactions', VerifyFirebaseToken, async (req, res) => {
-            // console.log(req.headers)
-            const email = req.query.email;
-            const query = {};
-            if (email) {
-                if (email !== req.token_email) {
-                    return res.status(403).send({ message: "Forbidden Access" })
-                }
-                query.email = email;
-            }
-            const cursor = TransactionCollection.find(query).sort({ date: -1 });
-            const result = await cursor.toArray();
-            res.send(result)
-        })
 
-        app.get('/transactions/:id',  async (req, res) => {
+        // Heard
+    
+        app.get('/transactions', VerifyFirebaseToken, async (req, res) => {
+            try {
+                const email = req.query.email;
+                const { limit, skip, sort = "date", order = "desc" } = req.query;
+
+                // Email check
+                if (email) {
+                    if (email !== req.token_email) {
+                        return res.status(403).send({ message: "Forbidden Access" });
+                    }
+                }
+
+                // Build query
+                const query = email ? { email } : {};
+
+                // Sorting option
+                const sortOption = {};
+                sortOption[sort] = order === "asc" ? 1 : -1;
+
+                // Fetch data
+                const transactions = await TransactionCollection
+                    .find(query)
+                    .sort(sortOption)
+                    .limit(Number(limit))
+                    .skip(Number(skip))
+                    .toArray();
+
+                // Total count
+                const total = await TransactionCollection.countDocuments(query);
+
+                res.send({ transactions, total });
+
+            } catch (error) {
+                console.error(error);
+                res.status(500).json({ error: "Internal Server Error" });
+            }
+        });
+
+        // Heard 
+
+        app.get('/transactions/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: new ObjectId(id) }
             const result = await TransactionCollection.findOne(query);
             res.send(result)
         })
-
 
         app.post('/transactions', VerifyFirebaseToken, async (req, res) => {
             // console.log("Hey",req.headers)
@@ -182,6 +211,7 @@ async function run() {
                 balance
             });
         });
+
         // await client.db("admin").command({ ping: 1 });
         // console.log("Pinged your deployment. You successfully connected to MongoDB!");
     } finally {
